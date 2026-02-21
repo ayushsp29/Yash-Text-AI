@@ -1,41 +1,48 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-// PASTE YOUR KEY FROM GOOGLE AI STUDIO HERE
-const API_KEY = "AIzaSyC5ckIRio6KrR1UGFvFUEoPsto_s2a4X28"; 
-const genAI = new GoogleGenerativeAI(API_KEY);
-
 window.processAI = async function(mode) {
-    const input = document.getElementById('userInput').value;
+    const userInput = document.getElementById('userInput').value;
     const outputBox = document.getElementById('resultBox');
     const outputText = document.getElementById('outputText');
     const loader = document.getElementById('loader');
 
-    if (!input.trim()) {
-        alert("Please paste some text first!");
-        return;
-    }
+    // 1. PASTE YOUR GROQ API KEY HERE
+    const GROQ_API_KEY = "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";
+
+    if (!userInput.trim()) return alert("Please paste some text first!");
 
     loader.classList.remove('hidden');
     outputBox.classList.add('hidden');
 
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${GROQ_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                // Using Llama 3 for best English & Hindi support
+                model: "llama-3.3-70b-versatile",
+                messages: [{
+                    role: "user",
+                    content: mode === 'summarize' 
+                        ? `Summarize this text in bullet points (English/Hindi): ${userInput}` 
+                        : `Explain this like I am an 8th grader (English/Hindi): ${userInput}`
+                }]
+            })
+        });
+
+        const data = await response.json();
         
-        let prompt = "";
-        if (mode === 'summarize') {
-            prompt = `Summarize the following text in its original language (English or Hindi). Use short bullet points: ${input}`;
+        if (data.choices && data.choices[0]) {
+            outputText.innerText = data.choices[0].message.content;
+            outputBox.classList.remove('hidden');
         } else {
-            prompt = `Explain this text like I am an 8th-grade student. Use very simple words. Keep the output in the original language (English or Hindi): ${input}`;
+            throw new Error("Invalid response from AI");
         }
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        
-        outputText.innerText = response.text();
-        outputBox.classList.remove('hidden');
     } catch (error) {
-        console.error(error);
-        alert("Make sure your API key is correct!");
+        console.error("Error:", error);
+        alert("AI Error: " + error.message);
     } finally {
         loader.classList.add('hidden');
     }
