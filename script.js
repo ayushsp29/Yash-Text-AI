@@ -1,13 +1,15 @@
+// --- CONFIGURATION ---
+const GROQ_API_KEY = "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";
+
+// --- CORE AI FUNCTION ---
 window.processAI = async function(mode) {
-    const userInput = document.getElementById('userInput').value;
+    const input = document.getElementById('userInput').value;
     const outputBox = document.getElementById('resultBox');
-    const outputText = document.getElementById('outputText');
+    const engOut = document.getElementById('engOutput');
+    const hinOut = document.getElementById('hinOutput');
     const loader = document.getElementById('loader');
 
-    // 1. PASTE YOUR GROQ API KEY HERE
-    const GROQ_API_KEY = "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";
-
-    if (!userInput.trim()) return alert("Please paste some text first!");
+    if (!input.trim()) return alert("Please enter some text!");
 
     loader.classList.remove('hidden');
     outputBox.classList.add('hidden');
@@ -20,30 +22,72 @@ window.processAI = async function(mode) {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                // Using Llama 3 for best English & Hindi support
                 model: "llama-3.3-70b-versatile",
                 messages: [{
                     role: "user",
-                    content: mode === 'summarize' 
-                        ? `Summarize this text in bullet points (English/Hindi): ${userInput}` 
-                        : `Explain this like I am an 8th grader (English/Hindi): ${userInput}`
+                    content: `Act as a tutor for an 8th-grade student. ${mode === 'summarize' ? 'Summarize' : 'Simplify'} the text below. 
+                    Format your response EXACTLY like this:
+                    English: [Your English response here]
+                    Hindi: [Your Hindi translation here]
+                    
+                    Text: ${input}`
                 }]
             })
         });
 
         const data = await response.json();
-        
-        if (data.choices && data.choices[0]) {
-            outputText.innerText = data.choices[0].message.content;
-            outputBox.classList.remove('hidden');
-        } else {
-            throw new Error("Invalid response from AI");
-        }
+        const fullContent = data.choices[0].message.content;
 
+        // Clean splitting logic
+        const [engPart, hinPart] = fullContent.split('Hindi:');
+        engOut.innerText = engPart.replace('English:', '').trim();
+        hinOut.innerText = hinPart ? hinPart.trim() : "Translation unavailable.";
+
+        outputBox.classList.remove('hidden');
     } catch (error) {
-        console.error("Error:", error);
-        alert("AI Error: " + error.message);
+        alert("Oops! Make sure your Groq Key is correct.");
+        console.error(error);
     } finally {
         loader.classList.add('hidden');
     }
-}
+};
+
+// --- VOICE RECOGNITION ---
+window.startVoice = function() {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'en-IN'; // Optimized for Indian English/Hindi
+    
+    document.getElementById('micBtn').innerText = "Listening... 👂";
+    recognition.start();
+
+    recognition.onresult = (event) => {
+        document.getElementById('userInput').value = event.results[0][0].transcript;
+        document.getElementById('micBtn').innerText = "🎤 Speak";
+    };
+
+    recognition.onerror = () => {
+        document.getElementById('micBtn').innerText = "🎤 Speak";
+        alert("Voice failed. Ensure you are using HTTPS (GitHub Pages) and allowed mic access!");
+    };
+};
+
+// --- TEXT TO SPEECH ---
+window.readAloud = function() {
+    const text = document.getElementById('engOutput').innerText;
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = 'en-US';
+    window.speechSynthesis.speak(speech);
+};
+
+// --- DOWNLOAD FEATURE ---
+window.downloadNote = function() {
+    const engText = document.getElementById('engOutput').innerText;
+    const hinText = document.getElementById('hinOutput').innerText;
+    const combined = `ENGLISH SUMMARY:\n${engText}\n\nHINDI SUMMARY:\n${hinText}`;
+    
+    const blob = new Blob([combined], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'AI_Tutor_Notes.txt';
+    link.click();
+};
