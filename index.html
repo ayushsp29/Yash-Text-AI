@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Text Helper (Eng/Hindi)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🇮🇳 AI Text Assistant</h1>
+        <p>Summarize or simplify text in English & Hindi!</p>
+            
+        
+        <textarea id="userInput" placeholder="Paste your English or Hindi text here..."></textarea>
+        
+        <div class="button-group">
+            <button onclick="processAI('summarize')">📋 Summarize It</button>
+            <button onclick="processAI('simplify')">💡 Explain Simply</button>
+        </div>
+
+        <div id="loader" class="hidden">AI is thinking... ✨</div>
+
+        <div id="resultBox" class="hidden">
+            <h3>Result:</h3>
+            <p id="outputText"></p>
+        </div>
+    </div>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+      }
+    </script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
