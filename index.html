@@ -3,37 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Text Helper (Eng/Hindi)</title>
+    <title>AI Smart Tutor | Bilingual Assistant</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>🇮🇳 AI Text Assistant</h1>
-        <p>Summarize or simplify text in English & Hindi!</p>
-            
-        
-        <textarea id="userInput" placeholder="Paste your English or Hindi text here..."></textarea>
-        
-        <div class="button-group">
-            <button onclick="processAI('summarize')">📋 Summarize It</button>
-            <button onclick="processAI('simplify')">💡 Explain Simply</button>
+        <header>
+            <h1>🇮🇳 AI Smart Tutor</h1>
+            <p>Your 8th Grade Study Buddy</p>
+        </header>
+
+        <div class="input-section">
+            <div class="input-wrapper">
+                <textarea id="userInput" placeholder="Paste a difficult paragraph here in English or Hindi..."></textarea>
+                <button id="micBtn" onclick="startVoice()">🎤 Speak</button>
+            </div>
+
+            <div class="main-controls">
+                <button class="btn primary-btn" onclick="processAI('summarize')">📋 Summarize</button>
+                <button class="btn secondary-btn" onclick="processAI('simplify')">💡 Explain Simply</button>
+            </div>
         </div>
 
-        <div id="loader" class="hidden">AI is thinking... ✨</div>
+        <div id="loader" class="hidden">
+            <div class="spinner"></div>
+            <p>AI is thinking... ✨</p>
+        </div>
 
-        <div id="resultBox" class="hidden">
-            <h3>Result:</h3>
-            <p id="outputText"></p>
+        <div id="resultBox" class="result-card hidden">
+            <div class="lang-split">
+                <div class="lang-box">
+                    <span class="badge">🇬🇧 English</span>
+                    <p id="engOutput"></p>
+                </div>
+                <div class="lang-box">
+                    <span class="badge">🇮🇳 Hindi</span>
+                    <p id="hinOutput"></p>
+                </div>
+            </div>
+            
+            <div class="result-actions">
+                <button class="action-btn" onclick="readAloud()">🔊 Read Out</button>
+                <button class="action-btn" onclick="downloadNote()">📥 Save Notes</button>
+            </div>
         </div>
     </div>
 
-    <script type="importmap">
-      {
-        "imports": {
-          "@google/generative-ai": "https://esm.run/@google/generative-ai"
-        }
-      }
-    </script>
-    <script type="module" src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
