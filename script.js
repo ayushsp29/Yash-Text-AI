@@ -1,5 +1,5 @@
 // --- CONFIGURATION ---
-const GROQ_API_KEY = "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";
+const GROQ_API_KEY = "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";
 
 // --- CORE AI FUNCTION ---
 window.processAI = async function(mode) {
@@ -91,3 +91,4 @@ window.downloadNote = function() {
     link.download = 'AI_Tutor_Notes.txt';
     link.click();
 };
+
